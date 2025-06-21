@@ -41,17 +41,17 @@ Each component lives in `src/components/` and exports its own Storybook story + 
 - [ ] Tests: upload triggers progress callback, handles cancel.
 
 ## 4. Page Composition
-- [ ] Create `src/app/dashboard/page.tsx`.
-- [ ] Compose `PlatformSelector`, `ScriptEditor`, `ThumbnailUploader`, `VideoUploader` inside responsive grid similar to sketch.
-- [ ] Use Tailwind grid classes (`grid-cols-3`, etc.) + `@container` queries for mobile.
+- [x] Create `src/app/dashboard/page.tsx`.
+- [x] Compose `PlatformSelector`, `ScriptEditor`, `ThumbnailUploader`, `VideoUploader` inside responsive grid similar to sketch.
+- [x] Use Tailwind grid classes (`grid-cols-3`, etc.) + `@container` queries for mobile.
 
 ## 5. Routing & Navigation
-- [ ] Add link from `/` landing page to `/dashboard`.
+- [x] Add link from `/` landing page to `/dashboard`.
 - [ ] Protect route if authentication is planned (placeholder).
 
 ## 6. End-to-End UX
-- [ ] Hook component callbacks into a temporary context/provider (`ContentDraftProvider`) to persist form state across refresh (optional localStorage).
-- [ ] Validate thumbnail + video size/ratio, display errors with shadcn `Alert`.
+- [x] Hook component callbacks into a temporary context/provider (`ContentDraftProvider`) to persist form state across refresh (optional localStorage).
+- [x] Validate thumbnail + video size/ratio, display errors with shadcn `Alert`.
 
 ## 7. Testing & Quality
 - [ ] **Unit tests** – Jest + React Testing Library for each component.
