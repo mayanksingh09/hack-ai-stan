@@ -6,11 +6,11 @@ Follow the steps in order. Mark a task complete by changing `[ ]` to `[x]`.
 ---
 
 ## 1. Project Preparation
-- [ ] **Sync repository** – `git pull origin main`.
-- [ ] **Install dependencies** – `pnpm install` / `npm install`.
-- [ ] **Add shadcn/ui CLI** – `npx shadcn-ui@latest init` (choose *Next.js, TypeScript, Tailwind*).
-- [ ] **Install icon library** – `pnpm add lucide-react` (or `react-icons`).
-- [ ] **Verify Tailwind config** – ensure `tailwind.config.ts` paths include `src/**/*.{ts,tsx}`.
+- [x] **Sync repository** – `git pull origin main`.
+- [x] **Install dependencies** – `pnpm install` / `npm install`.
+- [x] **Add shadcn/ui CLI** – `npx shadcn-ui@latest init` (choose *Next.js, TypeScript, Tailwind*).
+- [x] **Install icon library** – `pnpm add lucide-react` (or `react-icons`).
+- [x] **Verify Tailwind config** – ensure `tailwind.config.ts` paths include `src/**/*.{ts,tsx}`.
 
 ## 2. Design Tokens & Constants
 - [ ] Create `src/lib/constants/platforms.ts` exporting an array of platform metadata `{ id, label, icon }`.
