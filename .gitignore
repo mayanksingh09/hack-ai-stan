@@ -39,21 +39,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# cursor
-.cursor/*
-!.cursor/rules/
-!.cursor/rules/**
-
-# vscode
-.vscode/*
-
-# playwright
-playwright-report
-test-results
-
-# github actions
-.github
-
-# remove this from supabase tracking
-supabase/seed.sql
