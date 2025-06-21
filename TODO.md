@@ -13,31 +13,31 @@ Follow the steps in order. Mark a task complete by changing `[ ]` to `[x]`.
 - [x] **Verify Tailwind config** – ensure `tailwind.config.ts` paths include `src/**/*.{ts,tsx}`.
 
 ## 2. Design Tokens & Constants
-- [ ] Create `src/lib/constants/platforms.ts` exporting an array of platform metadata `{ id, label, icon }`.
-- [ ] Add any required color or spacing tokens to Tailwind config.
+- [x] Create `src/lib/constants/platforms.ts` exporting an array of platform metadata `{ id, label, icon }`.
+- [x] Add any required color or spacing tokens to Tailwind config.
 
 ## 3. Core Components (individually testable)
 Each component lives in `src/components/` and exports its own Storybook story + Jest tests.
 
 ### 3.1 PlatformSelector
-- [ ] Build using shadcn `ToggleGroup`/`Tabs` with icons from `lucide-react`.
-- [ ] Accept `value`, `onValueChange` props.
-- [ ] Include ARIA labels for accessibility.
+- [x] Build using shadcn `ToggleGroup`/`Tabs` with icons from `react-icons`.
+- [x] Accept `value`, `onValueChange` props.
+- [x] Include ARIA labels for accessibility.
 - [ ] Tests: renders all platforms, fires `onValueChange`.
 
 ### 3.2 ScriptEditor
-- [ ] Implement shadcn `Textarea` sized as per mockup.
-- [ ] Support controlled + uncontrolled usage.
+- [x] Implement shadcn `Textarea` sized as per mockup.
+- [x] Support controlled + uncontrolled usage.
 - [ ] Tests: type, resize, accessibility label.
 
 ### 3.3 ThumbnailUploader
-- [ ] Re-use shadcn `FileUpload` pattern or write custom dropzone (accept images only).
-- [ ] Preview thumbnail, expose `onFileSelect`.
+- [x] Re-use shadcn `FileUpload` pattern or write custom dropzone (accept images only).
+- [x] Preview thumbnail, expose `onFileSelect`.
 - [ ] Tests: accept/deny files, preview appears.
 
 ### 3.4 VideoUploader
-- [ ] Similar upload component accepting video/* MIME types.
-- [ ] Show progress bar (shadcn `Progress`).
+- [x] Similar upload component accepting video/* MIME types.
+- [x] Show progress bar (shadcn `Progress`).
 - [ ] Tests: upload triggers progress callback, handles cancel.
 
 ## 4. Page Composition
