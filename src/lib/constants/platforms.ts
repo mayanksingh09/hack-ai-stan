@@ -28,7 +28,7 @@ export const PLATFORMS: Platform[] = [
   },
   {
     id: 'twitter',
-    label: 'Twitter',
+    label: 'X',
     icon: SiX
   },
   {
