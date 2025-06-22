@@ -131,7 +131,52 @@ export default function DashboardPage() {
           </Alert>
         )}
 
-        {isComplete && (
+        {/* Primary Status Alert - Show transcription status first, then content status */}
+        {transcriptLoading && (
+          <Alert className="mb-6 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+            <FaSpinner className="h-4 w-4 text-blue-600 animate-spin" />
+            <AlertDescription>
+              <p className="font-medium text-blue-800 dark:text-blue-200">
+                Transcribing video... Please wait.
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {transcriptError && !transcriptLoading && (
+          <Alert className="mb-6 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950">
+            <FaExclamationTriangle className="h-4 w-4 text-red-600" />
+            <AlertDescription>
+              <p className="font-medium text-red-800 dark:text-red-200">
+                Transcription failed: {transcriptError}
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {transcript && !transcriptLoading && !transcriptError && isComplete && (
+          <Alert className="mb-6 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+            <FaCheck className="h-4 w-4 text-green-600" />
+            <AlertDescription>
+              <p className="font-medium text-green-800 dark:text-green-200">
+                Video transcribed successfully! Content draft is ready for publishing.
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {transcript && !transcriptLoading && !transcriptError && !isComplete && (
+          <Alert className="mb-6 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+            <FaCheck className="h-4 w-4 text-green-600" />
+            <AlertDescription>
+              <p className="font-medium text-green-800 dark:text-green-200">
+                Video transcription completed successfully!
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {!transcript && !transcriptLoading && !transcriptError && isComplete && (
           <Alert className="mb-6 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
             <FaCheck className="h-4 w-4 text-green-600" />
             <AlertDescription>
@@ -153,35 +198,6 @@ export default function DashboardPage() {
                 onValueChange={handlePlatformChange}
               />
             </div>
-
-            {/* Transcription Status */}
-            {contentDraft.videoUrl && (
-              <div className="bg-card border border-border rounded-lg p-6">
-                <h3 className="text-lg font-semibold mb-4">Video Transcription</h3>
-                {transcriptLoading && (
-                  <div className="flex items-center gap-2 text-blue-600">
-                    <FaSpinner className="animate-spin" />
-                    <span>Transcribing video...</span>
-                  </div>
-                )}
-                {transcriptError && (
-                  <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950">
-                    <FaExclamationTriangle className="h-4 w-4 text-red-600" />
-                    <AlertDescription>
-                      <p className="font-medium text-red-800 dark:text-red-200">
-                        Transcription failed: {transcriptError}
-                      </p>
-                    </AlertDescription>
-                  </Alert>
-                )}
-                {transcript && !transcriptLoading && (
-                  <div className="flex items-center gap-2 text-green-600">
-                    <FaCheck />
-                    <span>Transcription completed successfully</span>
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* Script Editor */}
             <div className="bg-card border border-border rounded-lg p-6">
