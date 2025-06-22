@@ -211,7 +211,7 @@ export const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
             </p>
             {videoFile && (
               <p className="text-xs text-muted-foreground/80 mb-2">
-                Or use the "Generate from Video" button above
+                Or use the &quot;Generate from Video&quot; button above
               </p>
             )}
             <p className="text-xs text-muted-foreground">

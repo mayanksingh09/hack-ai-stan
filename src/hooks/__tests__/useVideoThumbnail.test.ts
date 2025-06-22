@@ -73,7 +73,7 @@ describe('useVideoThumbnail', () => {
     let thumbnailResult: File | null = null
     
     await act(async () => {
-      thumbnailResult = await result.current.generateThumbnail(null as any)
+      thumbnailResult = await result.current.generateThumbnail(null as unknown as File)
     })
     
     expect(thumbnailResult).toBe(null)
@@ -86,7 +86,7 @@ describe('useVideoThumbnail', () => {
     
     // Simulate an error state
     act(() => {
-      result.current.generateThumbnail(null as any)
+      result.current.generateThumbnail(null as unknown as File)
     })
     
     expect(result.current.error).toBeTruthy()

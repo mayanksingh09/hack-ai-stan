@@ -7,20 +7,26 @@ interface TranscriptionState {
   error: string | null
 }
 
+interface TranscriptionWord {
+  word: string
+  start?: number
+  end?: number
+  confidence?: number
+}
+
+interface TranscriptionFormats {
+  srt?: string
+  vtt?: string
+  json?: unknown
+}
+
 interface TranscriptionResponse {
   text?: string | null
   transcript?: string | null
   language_code?: string
   language_probability?: number
-  words?: Array<any>
-  additional_formats?: any
-}
-
-interface TranscriptRecord {
-  id?: number
-  video_url: string
-  transcript: string
-  created_at?: string
+  words?: TranscriptionWord[]
+  additional_formats?: TranscriptionFormats
 }
 
 export const useTranscription = (videoUrl?: string) => {

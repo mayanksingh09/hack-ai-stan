@@ -109,7 +109,7 @@ export default function DashboardPage() {
             <BiDish className="text-white text-4xl" />
           </div>
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-            socialalfred
+            Stan Buddy
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Your AI-powered content creation assistant. Create engaging social media content across all platforms with intelligent transcription and optimization.
