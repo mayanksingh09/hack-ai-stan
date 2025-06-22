@@ -6,10 +6,12 @@ import ScriptEditor from '@/components/ScriptEditor'
 import ThumbnailUploader from '@/components/ThumbnailUploader'
 import VideoUploader from '@/components/VideoUploader'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { FaCheck, FaExclamationTriangle } from 'react-icons/fa'
+import { FaCheck, FaExclamationTriangle, FaSpinner } from 'react-icons/fa'
+import { useTranscription } from '@/hooks/useTranscription'
 
 interface ContentDraft {
   platform: string
+  platforms: string[]  // For future multi-platform support
   script: string
   thumbnail: File | null
   video: File | null
@@ -19,6 +21,7 @@ interface ContentDraft {
 export default function DashboardPage() {
   const [contentDraft, setContentDraft] = useState<ContentDraft>({
     platform: '',
+    platforms: [],
     script: '',
     thumbnail: null,
     video: null,
@@ -27,9 +30,23 @@ export default function DashboardPage() {
   
   const [errors, setErrors] = useState<string[]>([])
 
-  const handlePlatformChange = (platform: string) => {
-    setContentDraft(prev => ({ ...prev, platform }))
-    validateDraft({ ...contentDraft, platform })
+  // Use transcription hook
+  const { transcript, loading: transcriptLoading, error: transcriptError } = useTranscription(contentDraft.videoUrl)
+
+  // Update script when transcript is received
+  React.useEffect(() => {
+    if (transcript && !contentDraft.script) {
+      setContentDraft(prev => ({ ...prev, script: transcript }))
+    }
+  }, [transcript, contentDraft.script])
+
+  const handlePlatformChange = (value: string | string[]) => {
+    // Handle both single and multiple platform selection
+    const platform = Array.isArray(value) ? value[0] || '' : value
+    const platforms = Array.isArray(value) ? value : value ? [value] : []
+    
+    setContentDraft(prev => ({ ...prev, platform, platforms }))
+    validateDraft({ ...contentDraft, platform, platforms })
   }
 
   const handleScriptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -135,13 +152,44 @@ export default function DashboardPage() {
               />
             </div>
 
+            {/* Transcription Status */}
+            {contentDraft.videoUrl && (
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h3 className="text-lg font-semibold mb-4">Video Transcription</h3>
+                {transcriptLoading && (
+                  <div className="flex items-center gap-2 text-blue-600">
+                    <FaSpinner className="animate-spin" />
+                    <span>Transcribing video...</span>
+                  </div>
+                )}
+                {transcriptError && (
+                  <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950">
+                    <FaExclamationTriangle className="h-4 w-4 text-red-600" />
+                    <AlertDescription>
+                      <p className="font-medium text-red-800 dark:text-red-200">
+                        Transcription failed: {transcriptError}
+                      </p>
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {transcript && !transcriptLoading && (
+                  <div className="flex items-center gap-2 text-green-600">
+                    <FaCheck />
+                    <span>Transcription completed successfully</span>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Script Editor */}
             <div className="bg-card border border-border rounded-lg p-6">
               <ScriptEditor
                 value={contentDraft.script}
                 onChange={handleScriptChange}
-                placeholder="Write your engaging content here..."
+                placeholder={transcript ? "Generated transcript (you can edit this)" : "Write your engaging content here..."}
                 required
+                readOnly={transcriptLoading}
+                showEditToggle={!!transcript}
               />
             </div>
           </div>

@@ -12,14 +12,14 @@
   - [ ] E2E test with Playwright: select a small sample video → verify it appears in Supabase storage and UI shows 100 %.
 
 - ## 3. Transcript Retrieval**
-  - [ ] Create React hook `useTranscription(videoUrl)` inside `src/hooks/useTranscription.ts`:
-    - [ ] Call backend POST `/api/v1/transcribe` with payload `{ audio_url: videoUrl }`.
-    - [ ] Manage loading, success, error states and return the transcript string.
-  - [ ] Integrate the hook in the page:
-    - [ ] After upload completes, automatically request transcription.
-    - [ ] Show a skeleton/loader while waiting.
-    - [ ] Once received, populate `ScriptEditor` (read-only by default, with an "Edit" toggle).
-  - [ ] Unit-test the hook with mocked fetch.
+  - [x] Create React hook `useTranscription(videoUrl)` inside `src/hooks/useTranscription.ts`:
+    - [x] Call backend POST `/api/v1/transcribe` with payload `{ audio_url: videoUrl }`.
+    - [x] Manage loading, success, error states and return the transcript string.
+  - [x] Integrate the hook in the page:
+    - [x] After upload completes, automatically request transcription.
+    - [x] Show a skeleton/loader while waiting.
+    - [x] Once received, populate `ScriptEditor` (read-only by default, with an "Edit" toggle).
+  - [x] Unit-test the hook with mocked fetch.
 
 - ## 4. Platform Selection UI**
   - [ ] Enhance `PlatformSelector` to support multi-select (toggle-group `type="multiple"`).
