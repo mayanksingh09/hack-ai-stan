@@ -6,7 +6,7 @@ import ScriptEditor from '@/components/ScriptEditor'
 import ThumbnailUploader from '@/components/ThumbnailUploader'
 import VideoUploader from '@/components/VideoUploader'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { FaCheck, FaExclamationTriangle, FaSpinner } from 'react-icons/fa'
+import { FaCheck, FaExclamationTriangle, FaSpinner, FaRocket, FaPlay } from 'react-icons/fa'
 import { useTranscription } from '@/hooks/useTranscription'
 
 interface ContentDraft {
@@ -67,8 +67,6 @@ export default function DashboardPage() {
     validateDraft({ ...contentDraft, video: file, videoUrl: publicUrl })
   }
 
-
-
   const validateDraft = (draft: ContentDraft) => {
     const newErrors: string[] = []
     
@@ -102,21 +100,28 @@ export default function DashboardPage() {
     (contentDraft.thumbnail || contentDraft.video)
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Social Content Dashboard
+        {/* Enhanced Header */}
+        <div className="mb-12 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-6 shadow-lg">
+            <FaRocket className="text-white text-2xl" />
+          </div>
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+            alfredsocial
           </h1>
-          <p className="text-muted-foreground">
-            Create and manage your social media content across platforms
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Your AI-powered content creation assistant. Create engaging social media content across all platforms with intelligent transcription and optimization.
           </p>
+          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-muted-foreground">
+            <FaPlay size={12} />
+            <span>Upload • Transcribe • Optimize • Publish</span>
+          </div>
         </div>
 
         {/* Status Alert */}
         {errors.length > 0 && (
-          <Alert className="mb-6 border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+          <Alert className="mb-6 border-orange-200 bg-orange-50/80 backdrop-blur-sm dark:border-orange-800 dark:bg-orange-950/80 shadow-lg">
             <FaExclamationTriangle className="h-4 w-4 text-orange-600" />
             <AlertDescription>
               <div className="space-y-1">
@@ -133,7 +138,7 @@ export default function DashboardPage() {
 
         {/* Primary Status Alert - Show transcription status first, then content status */}
         {transcriptLoading && (
-          <Alert className="mb-6 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+          <Alert className="mb-6 border-blue-200 bg-blue-50/80 backdrop-blur-sm dark:border-blue-800 dark:bg-blue-950/80 shadow-lg">
             <FaSpinner className="h-4 w-4 text-blue-600 animate-spin" />
             <AlertDescription>
               <p className="font-medium text-blue-800 dark:text-blue-200">
@@ -144,7 +149,7 @@ export default function DashboardPage() {
         )}
 
         {transcriptError && !transcriptLoading && (
-          <Alert className="mb-6 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950">
+          <Alert className="mb-6 border-red-200 bg-red-50/80 backdrop-blur-sm dark:border-red-800 dark:bg-red-950/80 shadow-lg">
             <FaExclamationTriangle className="h-4 w-4 text-red-600" />
             <AlertDescription>
               <p className="font-medium text-red-800 dark:text-red-200">
@@ -155,7 +160,7 @@ export default function DashboardPage() {
         )}
 
         {transcript && !transcriptLoading && !transcriptError && isComplete && (
-          <Alert className="mb-6 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+          <Alert className="mb-6 border-green-200 bg-green-50/80 backdrop-blur-sm dark:border-green-800 dark:bg-green-950/80 shadow-lg">
             <FaCheck className="h-4 w-4 text-green-600" />
             <AlertDescription>
               <p className="font-medium text-green-800 dark:text-green-200">
@@ -166,7 +171,7 @@ export default function DashboardPage() {
         )}
 
         {transcript && !transcriptLoading && !transcriptError && !isComplete && (
-          <Alert className="mb-6 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+          <Alert className="mb-6 border-green-200 bg-green-50/80 backdrop-blur-sm dark:border-green-800 dark:bg-green-950/80 shadow-lg">
             <FaCheck className="h-4 w-4 text-green-600" />
             <AlertDescription>
               <p className="font-medium text-green-800 dark:text-green-200">
@@ -177,7 +182,7 @@ export default function DashboardPage() {
         )}
 
         {!transcript && !transcriptLoading && !transcriptError && isComplete && (
-          <Alert className="mb-6 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+          <Alert className="mb-6 border-green-200 bg-green-50/80 backdrop-blur-sm dark:border-green-800 dark:bg-green-950/80 shadow-lg">
             <FaCheck className="h-4 w-4 text-green-600" />
             <AlertDescription>
               <p className="font-medium text-green-800 dark:text-green-200">
@@ -188,70 +193,93 @@ export default function DashboardPage() {
         )}
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Platform & Script */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Platform Selection */}
-            <div className="bg-card border border-border rounded-lg p-6">
-              <PlatformSelector
-                value={contentDraft.platform}
-                onValueChange={handlePlatformChange}
-              />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {/* Top Left - Platform Selection */}
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm border border-white/20 dark:border-slate-700/50 rounded-2xl p-6 shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">1</span>
+              </div>
+              <h2 className="text-lg font-semibold text-foreground">Choose Your Platform</h2>
             </div>
-
-            {/* Script Editor */}
-            <div className="bg-card border border-border rounded-lg p-6">
-              <ScriptEditor
-                value={contentDraft.script}
-                onChange={handleScriptChange}
-                placeholder={transcript ? "Generated transcript (you can edit this)" : "Write your engaging content here..."}
-                required
-                readOnly={transcriptLoading}
-                showEditToggle={!!transcript}
-              />
-            </div>
+            <PlatformSelector
+              value={contentDraft.platform}
+              onValueChange={handlePlatformChange}
+            />
           </div>
 
-          {/* Right Column - Media Uploads */}
-          <div className="space-y-6">
-            {/* Thumbnail Upload */}
-            <div className="bg-card border border-border rounded-lg p-6">
-              <ThumbnailUploader
-                onFileSelect={handleThumbnailSelect}
-                maxSizeInMB={5}
-              />
+          {/* Top Right - Video Upload */}
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm border border-white/20 dark:border-slate-700/50 rounded-2xl p-6 shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-r from-rose-500 to-orange-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">2</span>
+              </div>
+              <h2 className="text-lg font-semibold text-foreground">Upload Video</h2>
             </div>
+            <VideoUploader
+              onFileSelect={handleVideoSelect}
+              maxSizeInMB={100}
+            />
+          </div>
 
-            {/* Video Upload */}
-            <div className="bg-card border border-border rounded-lg p-6">
-              <VideoUploader
-                onFileSelect={handleVideoSelect}
-                maxSizeInMB={100}
-              />
+          {/* Bottom Left - Script Editor */}
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm border border-white/20 dark:border-slate-700/50 rounded-2xl p-8 shadow-xl">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">3</span>
+              </div>
+              <h2 className="text-lg font-semibold text-foreground">Script</h2>
             </div>
+            <ScriptEditor
+              value={contentDraft.script}
+              onChange={handleScriptChange}
+              placeholder={transcript ? "Generated transcript (you can edit this)" : "Write your engaging content here..."}
+              required
+              readOnly={transcriptLoading}
+              showEditToggle={!!transcript}
+            />
+          </div>
+
+          {/* Bottom Right - Thumbnail Upload */}
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm border border-white/20 dark:border-slate-700/50 rounded-2xl p-8 shadow-xl">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">4</span>
+              </div>
+              <h2 className="text-lg font-semibold text-foreground">Thumbnail</h2>
+            </div>
+            <ThumbnailUploader
+              onFileSelect={handleThumbnailSelect}
+              maxSizeInMB={5}
+            />
           </div>
         </div>
 
         {/* Content Summary */}
         {isComplete && (
-          <div className="mt-8 bg-card border border-border rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4">Content Summary</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-muted-foreground">Platform:</span>
-                <p className="capitalize">{contentDraft.platform}</p>
+          <div className="mt-12 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 backdrop-blur-sm border border-green-200/50 dark:border-green-800/50 rounded-2xl p-8 shadow-xl">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                <FaCheck className="text-white text-lg" />
               </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Script Length:</span>
-                <p>{contentDraft.script.length} characters</p>
+              <h3 className="text-xl font-bold text-green-800 dark:text-green-200">Content Ready!</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-4 border border-white/40 dark:border-slate-700/40">
+                <span className="block font-medium text-muted-foreground text-sm mb-1">Platform</span>
+                <p className="font-semibold capitalize text-lg">{contentDraft.platform}</p>
               </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Thumbnail:</span>
-                <p>{contentDraft.thumbnail ? '✓ Uploaded' : '✗ Not uploaded'}</p>
+              <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-4 border border-white/40 dark:border-slate-700/40">
+                <span className="block font-medium text-muted-foreground text-sm mb-1">Script Length</span>
+                <p className="font-semibold text-lg">{contentDraft.script.length} chars</p>
               </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Video:</span>
-                <p>{contentDraft.video ? '✓ Uploaded' : '✗ Not uploaded'}</p>
+              <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-4 border border-white/40 dark:border-slate-700/40">
+                <span className="block font-medium text-muted-foreground text-sm mb-1">Thumbnail</span>
+                <p className="font-semibold text-lg">{contentDraft.thumbnail ? '✓ Ready' : '✗ Missing'}</p>
+              </div>
+              <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-4 border border-white/40 dark:border-slate-700/40">
+                <span className="block font-medium text-muted-foreground text-sm mb-1">Video</span>
+                <p className="font-semibold text-lg">{contentDraft.video ? '✓ Ready' : '✗ Missing'}</p>
               </div>
             </div>
           </div>
