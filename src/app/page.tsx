@@ -35,10 +35,12 @@ export default function DashboardPage() {
 
   // Update script when transcript is received
   React.useEffect(() => {
-    if (transcript && !contentDraft.script) {
+    if (transcript) {
+      // Always update the script with the transcript when it's received
+      // This ensures the transcript is always shown to the user
       setContentDraft(prev => ({ ...prev, script: transcript }))
     }
-  }, [transcript, contentDraft.script])
+  }, [transcript])
 
   const handlePlatformChange = (value: string | string[]) => {
     // Handle both single and multiple platform selection

@@ -52,7 +52,7 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
     
     try {
       // Get environment variables
-      const bucketName = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'hack-ai-public-storage-bucket'
+      const bucketName = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'hack-ai-storage'
       const s3Endpoint = process.env.NEXT_PUBLIC_SUPABASE_S3_ENDPOINT
       
       console.log('Upload config:', { bucketName, s3Endpoint })
