@@ -251,6 +251,7 @@ export default function DashboardPage() {
             <ThumbnailUploader
               onFileSelect={handleThumbnailSelect}
               maxSizeInMB={5}
+              videoFile={contentDraft.video}
             />
           </div>
         </div>

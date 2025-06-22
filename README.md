@@ -1,5 +1,28 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Features
+
+### Video Content Processing
+- **Video Upload**: Upload video files (MP4, WebM, AVI, MOV, etc.) with automatic cloud storage
+- **Video Transcription**: Automatic transcription of uploaded videos using AI
+- **Automatic Thumbnail Generation**: Extract the first frame from uploaded videos to create thumbnails automatically
+- **Platform-Specific Content**: Generate social media content optimized for different platforms
+- **Script Editing**: Edit and refine auto-generated transcripts
+
+### Video Thumbnail Generation
+The application includes an intelligent thumbnail generation feature that can extract the first frame from any uploaded video:
+
+1. Upload your video file using the video uploader
+2. Navigate to the thumbnail section
+3. Click the "Generate from Video" button to automatically extract and use the first frame as your thumbnail
+4. The generated thumbnail is automatically optimized for web use (JPEG format, 90% quality)
+
+This feature uses HTML5 Canvas API to process video frames client-side, ensuring privacy and fast processing.
+
+### Supported File Formats
+- **Videos**: MP4, WebM, OGG, AVI, MOV (up to 100MB)
+- **Images**: JPEG, PNG, WebP, GIF (up to 5MB)
+
 ## Getting Started
 
 ### Prerequisites

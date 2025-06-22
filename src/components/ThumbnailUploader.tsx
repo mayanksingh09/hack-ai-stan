@@ -1,14 +1,16 @@
 'use client'
 
 import React, { useState, useRef, useCallback } from 'react'
-import { FaTimes, FaImage } from 'react-icons/fa'
+import { FaTimes, FaImage, FaVideo, FaSpinner } from 'react-icons/fa'
 import Image from 'next/image'
+import { useVideoThumbnail } from '@/hooks/useVideoThumbnail'
 
 interface ThumbnailUploaderProps {
   onFileSelect?: (file: File | null) => void
   className?: string
   maxSizeInMB?: number
   acceptedTypes?: string[]
+  videoFile?: File | null
 }
 
 const DEFAULT_ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
@@ -18,12 +20,16 @@ export const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
   onFileSelect,
   className,
   maxSizeInMB = DEFAULT_MAX_SIZE_MB,
-  acceptedTypes = DEFAULT_ACCEPTED_TYPES
+  acceptedTypes = DEFAULT_ACCEPTED_TYPES,
+  videoFile
 }) => {
   const [preview, setPreview] = useState<string | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  // Use the custom hook for video thumbnail generation
+  const { generateThumbnail, isGenerating, error: thumbnailError, clearError } = useVideoThumbnail()
 
   const validateFile = useCallback((file: File): string | null => {
     if (!acceptedTypes.includes(file.type)) {
@@ -93,31 +99,86 @@ export const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
     fileInputRef.current?.click()
   }, [])
 
+  const generateThumbnailFromVideo = useCallback(async () => {
+    if (!videoFile) {
+      setError('No video file available for thumbnail generation')
+      return
+    }
+
+    clearError()
+    setError(null)
+
+    const thumbnailFile = await generateThumbnail(videoFile, 0.9)
+    
+    if (thumbnailFile) {
+      // Validate the generated file
+      const validationError = validateFile(thumbnailFile)
+      if (validationError) {
+        setError(validationError)
+        return
+      }
+
+      // Create preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setPreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(thumbnailFile)
+      
+      // Call the callback with the generated file
+      onFileSelect?.(thumbnailFile)
+    } else if (thumbnailError) {
+      setError(thumbnailError)
+    }
+  }, [videoFile, validateFile, onFileSelect, generateThumbnail, clearError, thumbnailError])
+
   return (
     <div className={className}>
-      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mb-3 block">
-        Thumbnail Image
-      </label>
+      <div className="flex items-center justify-between mb-3">
+        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          Thumbnail Image
+        </label>
+        {videoFile && (
+          <button
+            type="button"
+            onClick={generateThumbnailFromVideo}
+            disabled={isGenerating}
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-primary hover:text-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-primary/20 rounded-md hover:bg-primary/5"
+          >
+            {isGenerating ? (
+              <>
+                <FaSpinner className="animate-spin" size={12} />
+                Generating...
+              </>
+            ) : (
+              <>
+                <FaVideo size={12} />
+                Generate from Video
+              </>
+            )}
+          </button>
+        )}
+      </div>
       
       <div
         className={`relative border-2 border-dashed rounded-lg p-6 transition-colors cursor-pointer ${
           isDragOver
             ? 'border-primary bg-primary/5'
-            : error
+            : (error || thumbnailError)
             ? 'border-destructive bg-destructive/5'
             : 'border-border hover:border-primary/50'
         }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        onClick={openFileDialog}
+        onClick={!isGenerating ? openFileDialog : undefined}
         role="button"
         tabIndex={0}
         aria-label="Upload thumbnail image"
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault()
-            openFileDialog()
+            if (!isGenerating) openFileDialog()
           }
         }}
       >
@@ -148,6 +209,11 @@ export const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
             <p className="text-sm text-muted-foreground mb-2">
               Drop an image here or click to select
             </p>
+            {videoFile && (
+              <p className="text-xs text-muted-foreground/80 mb-2">
+                Or use the "Generate from Video" button above
+              </p>
+            )}
             <p className="text-xs text-muted-foreground">
               Supports: {acceptedTypes.map(type => type.split('/')[1]).join(', ')} (max {maxSizeInMB}MB)
             </p>
@@ -164,9 +230,9 @@ export const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
         />
       </div>
       
-      {error && (
+      {(error || thumbnailError) && (
         <p className="text-sm text-destructive mt-2" role="alert">
-          {error}
+          {error || thumbnailError}
         </p>
       )}
       
