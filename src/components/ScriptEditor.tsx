@@ -52,7 +52,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         disabled={disabled}
         readOnly={showEditToggle ? !isEditing : readOnly}
         required={required}
-        className="min-h-[120px] resize-y"
+        className="h-80 resize-none overflow-y-auto"
         aria-label="Content script editor"
         aria-describedby="content-script-description"
       />

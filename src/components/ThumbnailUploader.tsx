@@ -187,9 +187,9 @@ export const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
             <Image
               src={preview}
               alt="Thumbnail preview"
-              className="w-full h-32 object-cover rounded"
-              width={128}
-              height={128}
+              className="w-full aspect-square object-cover rounded max-w-xs mx-auto"
+              width={320}
+              height={320}
             />
             <button
               type="button"
@@ -197,7 +197,7 @@ export const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
                 e.stopPropagation()
                 handleRemove()
               }}
-              className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90 transition-colors"
+              className="absolute top-2 right-2 p-1 bg-black text-white rounded-full hover:bg-black/80 transition-colors"
               aria-label="Remove thumbnail"
             >
               <FaTimes size={12} />

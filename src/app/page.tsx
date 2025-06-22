@@ -6,7 +6,8 @@ import ScriptEditor from '@/components/ScriptEditor'
 import ThumbnailUploader from '@/components/ThumbnailUploader'
 import VideoUploader from '@/components/VideoUploader'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { FaCheck, FaExclamationTriangle, FaSpinner, FaRocket, FaPlay } from 'react-icons/fa'
+import { FaCheck, FaExclamationTriangle, FaSpinner, FaPlay } from 'react-icons/fa'
+import { BiDish } from 'react-icons/bi'
 import { useTranscription } from '@/hooks/useTranscription'
 
 interface ContentDraft {
@@ -105,10 +106,10 @@ export default function DashboardPage() {
         {/* Enhanced Header */}
         <div className="mb-12 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-6 shadow-lg">
-            <FaRocket className="text-white text-2xl" />
+            <BiDish className="text-white text-4xl" />
           </div>
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-            alfredsocial
+            socialalfred
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Your AI-powered content creation assistant. Create engaging social media content across all platforms with intelligent transcription and optimization.
@@ -223,8 +224,8 @@ export default function DashboardPage() {
           </div>
 
           {/* Bottom Left - Script Editor */}
-          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm border border-white/20 dark:border-slate-700/50 rounded-2xl p-8 shadow-xl">
-            <div className="flex items-center gap-3 mb-6">
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm border border-white/20 dark:border-slate-700/50 rounded-2xl p-6 shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">3</span>
               </div>
@@ -241,8 +242,8 @@ export default function DashboardPage() {
           </div>
 
           {/* Bottom Right - Thumbnail Upload */}
-          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm border border-white/20 dark:border-slate-700/50 rounded-2xl p-8 shadow-xl">
-            <div className="flex items-center gap-3 mb-6">
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm border border-white/20 dark:border-slate-700/50 rounded-2xl p-6 shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">4</span>
               </div>
