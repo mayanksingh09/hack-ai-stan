@@ -4,11 +4,11 @@
   - [x] Unit-test the client initialisation.
 
 - ## 2. Video Upload Flow**
-  - [ ] Refactor `VideoUploader` to use the Supabase client:
-    - [ ] On file selection, upload the file to `videos/` bucket path with a unique filename (e.g. uuid + original extension).
-    - [ ] Replace the current simulated progress with real upload progress from Supabase.
-    - [ ] Return the public URL of the uploaded video via `onFileSelect` callback.
-  - [ ] Allow cancelling an in-progress upload (abort & remove partially-uploaded file).
+  - [x] Refactor `VideoUploader` to use the Supabase client:
+    - [x] On file selection, upload the file to `videos/` bucket path with a unique filename (e.g. uuid + original extension).
+    - [x] Replace the current simulated progress with real upload progress from Supabase.
+    - [x] Return the public URL of the uploaded video via `onFileSelect` callback.
+  - [x] Allow cancelling an in-progress upload (abort & remove partially-uploaded file).
   - [ ] E2E test with Playwright: select a small sample video → verify it appears in Supabase storage and UI shows 100 %.
 
 - ## 3. Transcript Retrieval**

@@ -13,6 +13,7 @@ interface ContentDraft {
   script: string
   thumbnail: File | null
   video: File | null
+  videoUrl?: string
 }
 
 export default function DashboardPage() {
@@ -20,11 +21,11 @@ export default function DashboardPage() {
     platform: '',
     script: '',
     thumbnail: null,
-    video: null
+    video: null,
+    videoUrl: undefined
   })
   
   const [errors, setErrors] = useState<string[]>([])
-  const [uploadProgress, setUploadProgress] = useState<number>(0)
 
   const handlePlatformChange = (platform: string) => {
     setContentDraft(prev => ({ ...prev, platform }))
@@ -42,14 +43,12 @@ export default function DashboardPage() {
     validateDraft({ ...contentDraft, thumbnail: file })
   }
 
-  const handleVideoSelect = (file: File | null) => {
-    setContentDraft(prev => ({ ...prev, video: file }))
-    validateDraft({ ...contentDraft, video: file })
+  const handleVideoSelect = (file: File | null, publicUrl?: string) => {
+    setContentDraft(prev => ({ ...prev, video: file, videoUrl: publicUrl }))
+    validateDraft({ ...contentDraft, video: file, videoUrl: publicUrl })
   }
 
-  const handleUploadProgress = (progress: number) => {
-    setUploadProgress(progress)
-  }
+
 
   const validateDraft = (draft: ContentDraft) => {
     const newErrors: string[] = []
@@ -161,7 +160,6 @@ export default function DashboardPage() {
             <div className="bg-card border border-border rounded-lg p-6">
               <VideoUploader
                 onFileSelect={handleVideoSelect}
-                onUploadProgress={handleUploadProgress}
                 maxSizeInMB={100}
               />
             </div>

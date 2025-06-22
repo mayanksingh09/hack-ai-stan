@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useCallback } from 'react'
-import { FaUpload, FaTimes, FaImage } from 'react-icons/fa'
+import { FaTimes, FaImage } from 'react-icons/fa'
 
 interface ThumbnailUploaderProps {
   onFileSelect?: (file: File | null) => void

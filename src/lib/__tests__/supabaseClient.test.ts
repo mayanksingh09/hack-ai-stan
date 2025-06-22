@@ -20,17 +20,17 @@ describe('Supabase Client', () => {
     jest.resetModules()
   })
 
-  it('should initialize client with correct environment variables', () => {
+  it('should initialize client with correct environment variables', async () => {
     // Set up environment variables
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
 
     // Mock the client creation
     const mockClient = { from: jest.fn() }
-    mockCreateClient.mockReturnValue(mockClient as any)
+    mockCreateClient.mockReturnValue(mockClient as unknown as ReturnType<typeof createClient>)
 
     // Import the client (this will execute the initialization)
-    require('../supabaseClient')
+    await import('../supabaseClient')
 
     // Verify that createClient was called with correct parameters
     expect(mockCreateClient).toHaveBeenCalledWith(
@@ -39,30 +39,30 @@ describe('Supabase Client', () => {
     )
   })
 
-  it('should throw error when SUPABASE_URL is missing', () => {
+  it('should throw error when SUPABASE_URL is missing', async () => {
     // Set only the anon key
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
 
     // Import should throw an error
-    expect(() => {
-      require('../supabaseClient')
-    }).toThrow('Missing env.NEXT_PUBLIC_SUPABASE_URL')
+    await expect(async () => {
+      await import('../supabaseClient')
+    }).rejects.toThrow('Missing env.NEXT_PUBLIC_SUPABASE_URL')
   })
 
-  it('should throw error when SUPABASE_ANON_KEY is missing', () => {
+  it('should throw error when SUPABASE_ANON_KEY is missing', async () => {
     // Set only the URL
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
 
     // Import should throw an error
-    expect(() => {
-      require('../supabaseClient')
-    }).toThrow('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY')
+    await expect(async () => {
+      await import('../supabaseClient')
+    }).rejects.toThrow('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY')
   })
 
-  it('should throw error when both environment variables are missing', () => {
+  it('should throw error when both environment variables are missing', async () => {
     // Import should throw an error for missing URL first
-    expect(() => {
-      require('../supabaseClient')
-    }).toThrow('Missing env.NEXT_PUBLIC_SUPABASE_URL')
+    await expect(async () => {
+      await import('../supabaseClient')
+    }).rejects.toThrow('Missing env.NEXT_PUBLIC_SUPABASE_URL')
   })
 }) 

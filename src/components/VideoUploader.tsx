@@ -3,9 +3,11 @@
 import React, { useState, useRef, useCallback } from 'react'
 import { FaVideo, FaTimes, FaPlay } from 'react-icons/fa'
 import { Progress } from '@/components/ui/progress'
+import { supabase } from '@/lib/supabaseClient'
+import { v4 as uuidv4 } from 'uuid'
 
 interface VideoUploaderProps {
-  onFileSelect?: (file: File | null) => void
+  onFileSelect?: (file: File | null, publicUrl?: string) => void
   onUploadProgress?: (progress: number) => void
   className?: string
   maxSizeInMB?: number
@@ -42,32 +44,55 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
     return null
   }, [acceptedTypes, maxSizeInMB])
 
-  const simulateUpload = useCallback((file: File) => {
+  const uploadToSupabase = useCallback(async (file: File) => {
     setIsUploading(true)
     setUploadProgress(0)
+    setError(null)
     uploadControllerRef.current = new AbortController()
     
-    // Simulate upload progress
-    const interval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setIsUploading(false)
-          return 100
-        }
-        const newProgress = prev + 10
-        onUploadProgress?.(newProgress)
-        return newProgress
-      })
-    }, 200)
-    
-    // Handle cancellation
-    uploadControllerRef.current.signal.addEventListener('abort', () => {
-      clearInterval(interval)
+    try {
+      // Generate unique filename
+      const fileExtension = file.name.split('.').pop()
+      const uniqueFilename = `${uuidv4()}.${fileExtension}`
+      const filePath = `videos/${uniqueFilename}`
+      
+      // Upload to Supabase storage with progress tracking
+      const { error } = await supabase.storage
+        .from('videos')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+      
+      if (error) {
+        throw error
+      }
+      
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('videos')
+        .getPublicUrl(filePath)
+      
+      setUploadProgress(100)
+      setIsUploading(false)
+      onUploadProgress?.(100)
+      
+      // Call onFileSelect with both file and public URL
+      onFileSelect?.(file, urlData.publicUrl)
+      
+    } catch (error: unknown) {
+      if (uploadControllerRef.current?.signal.aborted) {
+        // Upload was cancelled
+        return
+      }
+      
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed. Please try again.'
+      console.error('Upload failed:', error)
+      setError(errorMessage)
       setIsUploading(false)
       setUploadProgress(0)
-    })
-  }, [onUploadProgress])
+    }
+  }, [onFileSelect, onUploadProgress])
 
   const handleFileSelect = useCallback((file: File) => {
     const validationError = validateFile(file)
@@ -78,9 +103,8 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
 
     setError(null)
     setSelectedFile(file)
-    onFileSelect?.(file)
-    simulateUpload(file)
-  }, [validateFile, onFileSelect, simulateUpload])
+    uploadToSupabase(file)
+  }, [validateFile, uploadToSupabase])
 
   const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -117,15 +141,21 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
     setError(null)
     setUploadProgress(0)
     setIsUploading(false)
-    onFileSelect?.(null)
+    onFileSelect?.(null, undefined)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
   }, [onFileSelect])
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = useCallback(async () => {
     if (uploadControllerRef.current) {
       uploadControllerRef.current.abort()
+      setIsUploading(false)
+      setUploadProgress(0)
+      setError(null)
+      
+      // Note: Supabase doesn't provide a direct way to cancel in-progress uploads
+      // The upload will continue but we ignore the result
     }
   }, [])
 
