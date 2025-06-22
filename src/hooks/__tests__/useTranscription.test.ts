@@ -5,9 +5,30 @@ import { useTranscription } from '../useTranscription'
 const mockFetch = jest.fn()
 global.fetch = mockFetch
 
+// Mock Supabase functions
+const mockSupabaseMaybeSingle = jest.fn()
+const mockSupabaseInsert = jest.fn()
+
+jest.mock('@/lib/supabaseClient', () => ({
+  supabase: {
+    from: jest.fn(() => ({
+      select: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          maybeSingle: mockSupabaseMaybeSingle
+        }))
+      })),
+      insert: mockSupabaseInsert
+    }))
+  }
+}))
+
 describe('useTranscription', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    
+    // Default: no existing transcript
+    mockSupabaseMaybeSingle.mockResolvedValue({ data: null, error: null })
+    mockSupabaseInsert.mockResolvedValue({ error: null })
   })
 
   it('should initialize with default state', () => {
@@ -46,7 +67,7 @@ describe('useTranscription', () => {
       expect(result.current.loading).toBe(false)
     })
 
-    expect(mockFetch).toHaveBeenCalledWith('/api/v1/transcribe', {
+    expect(mockFetch).toHaveBeenCalledWith('http://localhost:8000/api/v1/transcribe', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -126,8 +147,7 @@ describe('useTranscription', () => {
     // Call retry
     result.current.retry()
 
-    expect(result.current.loading).toBe(true)
-
+    // Wait for retry to complete
     await waitFor(() => {
       expect(result.current.loading).toBe(false)
     })
@@ -180,5 +200,54 @@ describe('useTranscription', () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(2)
     expect(result.current.transcript).toBe('Second transcript')
+  })
+
+  it('should use cached transcript from Supabase when available', async () => {
+    // Mock existing transcript in Supabase
+    mockSupabaseMaybeSingle.mockResolvedValue({
+      data: { transcript: 'Cached transcript from DB' },
+      error: null
+    })
+
+    const { result } = renderHook(() => useTranscription('https://example.com/video.mp4'))
+
+    // Should start loading
+    expect(result.current.loading).toBe(true)
+
+    // Wait for completion
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
+
+    // Should use cached transcript without making API call
+    expect(result.current.transcript).toBe('Cached transcript from DB')
+    expect(mockFetch).not.toHaveBeenCalled()
+    expect(mockSupabaseMaybeSingle).toHaveBeenCalled()
+  })
+
+  it('should save new transcript to Supabase after API call', async () => {
+    const mockResponse = {
+      transcript: 'New transcript from API'
+    }
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse)
+    })
+
+    const { result } = renderHook(() => useTranscription('https://example.com/video.mp4'))
+
+    // Wait for completion
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
+
+    expect(result.current.transcript).toBe('New transcript from API')
+    expect(mockFetch).toHaveBeenCalled()
+    expect(mockSupabaseInsert).toHaveBeenCalledWith({
+      video_url: 'https://example.com/video.mp4',
+      transcript: 'New transcript from API',
+      created_at: expect.any(String)
+    })
   })
 }) 

@@ -20,6 +20,7 @@
     - [x] Show a skeleton/loader while waiting.
     - [x] Once received, populate `ScriptEditor` (read-only by default, with an "Edit" toggle).
   - [x] Unit-test the hook with mocked fetch.
+  - [x] Store transcript in Supabase table `transcripts` with columns `video_url`, `transcript`, `created_at`.
 
 - ## 4. Platform Selection UI**
   - [x] Enhance `PlatformSelector` to support multi-select (toggle-group `type="multiple"`).
