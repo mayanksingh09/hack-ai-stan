@@ -51,14 +51,22 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
     uploadControllerRef.current = new AbortController()
     
     try {
+      // Get environment variables
+      const bucketName = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'hack-ai-public-storage-bucket'
+      const s3Endpoint = process.env.NEXT_PUBLIC_SUPABASE_S3_ENDPOINT
+      
+      console.log('Upload config:', { bucketName, s3Endpoint })
+      
       // Generate unique filename
       const fileExtension = file.name.split('.').pop()
       const uniqueFilename = `${uuidv4()}.${fileExtension}`
       const filePath = `videos/${uniqueFilename}`
       
+      console.log('File path:', filePath)
+      
       // Upload to Supabase storage with progress tracking
       const { error } = await supabase.storage
-        .from('videos')
+        .from(bucketName)
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false
@@ -68,17 +76,19 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
         throw error
       }
       
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('videos')
-        .getPublicUrl(filePath)
+      // Construct public URL using the specified format: SUPABASE_S3_ENDPOINT/SUPABASE_STORAGE_BUCKET/videos
+      const publicUrl = s3Endpoint 
+        ? `${s3Endpoint}/${bucketName}/${filePath}`
+        : supabase.storage.from(bucketName).getPublicUrl(filePath).data.publicUrl
+
+      console.log('publicUrl', publicUrl)
       
       setUploadProgress(100)
       setIsUploading(false)
       onUploadProgress?.(100)
       
       // Call onFileSelect with both file and public URL
-      onFileSelect?.(file, urlData.publicUrl)
+      onFileSelect?.(file, publicUrl)
       
     } catch (error: unknown) {
       if (uploadControllerRef.current?.signal.aborted) {

@@ -21,7 +21,10 @@ export const useTranscription = (videoUrl?: string) => {
     setState(prev => ({ ...prev, loading: true, error: null }))
 
     try {
-      const response = await fetch('/api/v1/transcribe', {
+      const fastApiUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+      const transcribeEndpoint = `${fastApiUrl}/api/v1/transcribe`
+      
+      const response = await fetch(transcribeEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

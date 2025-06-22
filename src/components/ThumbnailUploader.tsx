@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useCallback } from 'react'
 import { FaTimes, FaImage } from 'react-icons/fa'
+import Image from 'next/image'
 
 interface ThumbnailUploaderProps {
   onFileSelect?: (file: File | null) => void
@@ -122,10 +123,12 @@ export const ThumbnailUploader: React.FC<ThumbnailUploaderProps> = ({
       >
         {preview ? (
           <div className="relative">
-            <img
+            <Image
               src={preview}
               alt="Thumbnail preview"
               className="w-full h-32 object-cover rounded"
+              width={128}
+              height={128}
             />
             <button
               type="button"
