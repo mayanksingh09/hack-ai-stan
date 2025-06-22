@@ -22,8 +22,8 @@
   - [x] Unit-test the hook with mocked fetch.
 
 - ## 4. Platform Selection UI**
-  - [ ] Enhance `PlatformSelector` to support multi-select (toggle-group `type="multiple"`).
-  - [ ] Keep single-select behaviour for now but store value as array internally for future expansion.
+  - [x] Enhance `PlatformSelector` to support multi-select (toggle-group `type="multiple"`).
+  - [x] Keep single-select behaviour for now but store value as array internally for future expansion.
 
 - ## 5. Content Generation Flow**
   - [ ] Add "Generate Content" button component.

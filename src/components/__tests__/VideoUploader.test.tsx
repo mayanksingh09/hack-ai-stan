@@ -2,7 +2,6 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { VideoUploader } from '../VideoUploader'
-import { supabase } from '@/lib/supabaseClient'
 
 // Mock functions
 const mockUpload = jest.fn()
@@ -27,7 +26,6 @@ jest.mock('uuid', () => ({
 
 describe('VideoUploader', () => {
   const mockOnFileSelect = jest.fn()
-  const mockOnUploadProgress = jest.fn()
 
   beforeEach(() => {
     jest.clearAllMocks()
