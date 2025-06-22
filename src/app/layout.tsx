@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stan Buddy",
+  title: "Social Buddy",
   description: "Your AI-powered content creation assistant. Create engaging social media content across all platforms with intelligent transcription and optimization.",
   icons: {
     icon: [

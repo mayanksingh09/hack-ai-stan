@@ -1,7 +1,6 @@
 import { 
   SiYoutube, 
   SiInstagram, 
-  SiX, 
   SiFacebook, 
   SiLinkedin, 
   SiTwitch,
@@ -25,11 +24,6 @@ export const PLATFORMS: Platform[] = [
     id: 'instagram',
     label: 'Instagram', 
     icon: SiInstagram
-  },
-  {
-    id: 'twitter',
-    label: 'X',
-    icon: SiX
   },
   {
     id: 'tiktok',

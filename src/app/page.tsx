@@ -9,6 +9,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { FaCheck, FaExclamationTriangle, FaSpinner, FaPlay } from 'react-icons/fa'
 import { BiDish } from 'react-icons/bi'
 import { useTranscription } from '@/hooks/useTranscription'
+import { useContentGeneration } from '@/hooks/useContentGeneration'
+import GenerateContentButton from '@/components/GenerateContentButton'
+import GeneratedContentCard from '@/components/GeneratedContentCard'
 
 interface ContentDraft {
   platform: string
@@ -33,6 +36,9 @@ export default function DashboardPage() {
 
   // Use transcription hook
   const { transcript, loading: transcriptLoading, error: transcriptError } = useTranscription(contentDraft.videoUrl)
+  
+  // Use content generation hook
+  const { generatedContent, generateContent, isGenerating, clearContent } = useContentGeneration()
 
   // Update script when transcript is received
   React.useEffect(() => {
@@ -50,12 +56,18 @@ export default function DashboardPage() {
     
     setContentDraft(prev => ({ ...prev, platform, platforms }))
     validateDraft({ ...contentDraft, platform, platforms })
+    
+    // Clear generated content when platforms change
+    clearContent()
   }
 
   const handleScriptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const script = e.target.value
     setContentDraft(prev => ({ ...prev, script }))
     validateDraft({ ...contentDraft, script })
+    
+    // Clear generated content when script changes significantly
+    clearContent()
   }
 
   const handleThumbnailSelect = (file: File | null) => {
@@ -66,13 +78,16 @@ export default function DashboardPage() {
   const handleVideoSelect = (file: File | null, publicUrl?: string) => {
     setContentDraft(prev => ({ ...prev, video: file, videoUrl: publicUrl }))
     validateDraft({ ...contentDraft, video: file, videoUrl: publicUrl })
+    
+    // Clear generated content when video changes
+    clearContent()
   }
 
   const validateDraft = (draft: ContentDraft) => {
     const newErrors: string[] = []
     
-    if (!draft.platform) {
-      newErrors.push('Please select a platform')
+    if (draft.platforms.length === 0) {
+      newErrors.push('Please select at least one platform')
     }
     
     if (!draft.script.trim()) {
@@ -84,11 +99,11 @@ export default function DashboardPage() {
     }
     
     // Platform-specific validations
-    if (draft.platform === 'youtube' && !draft.video) {
+    if (draft.platforms.includes('youtube') && !draft.video) {
       newErrors.push('YouTube content requires a video upload')
     }
     
-    if (draft.platform === 'instagram' && !draft.thumbnail) {
+    if (draft.platforms.includes('instagram') && !draft.thumbnail) {
       newErrors.push('Instagram content requires a thumbnail image')
     }
     
@@ -96,9 +111,17 @@ export default function DashboardPage() {
   }
 
   const isComplete = errors.length === 0 && 
-    contentDraft.platform && 
+    contentDraft.platforms.length > 0 && 
     contentDraft.script.trim() && 
     (contentDraft.thumbnail || contentDraft.video)
+
+  const handleGenerateContent = () => {
+    if (contentDraft.script.trim() && contentDraft.platforms.length > 0) {
+      generateContent(contentDraft.platforms, contentDraft.script)
+    }
+  }
+
+  const hasGeneratedContent = Object.keys(generatedContent).length > 0
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
@@ -109,7 +132,7 @@ export default function DashboardPage() {
             <BiDish className="text-white text-4xl" />
           </div>
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-            Stan Buddy
+            Social Buddy
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Your AI-powered content creation assistant. Create engaging social media content across all platforms with intelligent transcription and optimization.
@@ -119,23 +142,6 @@ export default function DashboardPage() {
             <span>Upload • Transcribe • Optimize • Publish</span>
           </div>
         </div>
-
-        {/* Status Alert */}
-        {errors.length > 0 && (
-          <Alert className="mb-6 border-orange-200 bg-orange-50/80 backdrop-blur-sm dark:border-orange-800 dark:bg-orange-950/80 shadow-lg">
-            <FaExclamationTriangle className="h-4 w-4 text-orange-600" />
-            <AlertDescription>
-              <div className="space-y-1">
-                <p className="font-medium">Please complete the following:</p>
-                <ul className="list-disc list-inside space-y-1 text-sm">
-                  {errors.map((error, index) => (
-                    <li key={index}>{error}</li>
-                  ))}
-                </ul>
-              </div>
-            </AlertDescription>
-          </Alert>
-        )}
 
         {/* Primary Status Alert - Show transcription status first, then content status */}
         {transcriptLoading && (
@@ -204,8 +210,9 @@ export default function DashboardPage() {
               <h2 className="text-lg font-semibold text-foreground">Choose Your Platform</h2>
             </div>
             <PlatformSelector
-              value={contentDraft.platform}
+              value={contentDraft.platforms}
               onValueChange={handlePlatformChange}
+              multiple={true}
             />
           </div>
 
@@ -268,8 +275,12 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-4 border border-white/40 dark:border-slate-700/40">
-                <span className="block font-medium text-muted-foreground text-sm mb-1">Platform</span>
-                <p className="font-semibold capitalize text-lg">{contentDraft.platform}</p>
+                <span className="block font-medium text-muted-foreground text-sm mb-1">
+                  Platform{contentDraft.platforms.length > 1 ? 's' : ''}
+                </span>
+                <p className="font-semibold capitalize text-lg">
+                  {contentDraft.platforms.length > 0 ? contentDraft.platforms.join(', ') : 'None'}
+                </p>
               </div>
               <div className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-4 border border-white/40 dark:border-slate-700/40">
                 <span className="block font-medium text-muted-foreground text-sm mb-1">Script Length</span>
@@ -283,6 +294,46 @@ export default function DashboardPage() {
                 <span className="block font-medium text-muted-foreground text-sm mb-1">Video</span>
                 <p className="font-semibold text-lg">{contentDraft.video ? '✓ Ready' : '✗ Missing'}</p>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Generate Content Section */}
+        {isComplete && (
+          <div className="mt-8 max-w-2xl mx-auto">
+            <GenerateContentButton
+              onGenerate={handleGenerateContent}
+              loading={isGenerating}
+              disabled={!contentDraft.script.trim() || contentDraft.platforms.length === 0}
+              platforms={contentDraft.platforms}
+            />
+          </div>
+        )}
+
+        {/* Generated Content Cards */}
+        {hasGeneratedContent && (
+          <div className="mt-12">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">AI</span>
+              </div>
+              <h3 className="text-2xl font-bold text-foreground">Generated Content</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {contentDraft.platforms.map((platform) => {
+                const state = generatedContent[platform]
+                if (!state) return null
+                
+                return (
+                  <GeneratedContentCard
+                    key={platform}
+                    content={state.content || { platform, title: '', tags: [] }}
+                    loading={state.loading}
+                    error={state.error}
+                  />
+                )
+              })}
             </div>
           </div>
         )}
