@@ -4,7 +4,8 @@ import {
   SiFacebook, 
   SiLinkedin, 
   SiTwitch,
-  SiTiktok
+  SiTiktok,
+  SiX
 } from 'react-icons/si'
 import { type IconType } from 'react-icons'
 
@@ -44,6 +45,11 @@ export const PLATFORMS: Platform[] = [
     id: 'twitch',
     label: 'Twitch',
     icon: SiTwitch
+  },
+  {
+    id: 'x_twitter',
+    label: 'X (Twitter)',
+    icon: SiX
   }
 ]
 

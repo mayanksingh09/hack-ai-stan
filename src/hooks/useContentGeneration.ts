@@ -6,6 +6,17 @@ interface GeneratedContent {
   platform: string
   title: string
   tags: string[]
+  // Platform-specific content fields
+  description?: string // YouTube
+  caption?: string // Instagram, TikTok
+  post_body?: string // Facebook, LinkedIn, X/Twitter
+  headline?: string // LinkedIn, Facebook
+  bio?: string // all platforms
+  username?: string // all platforms
+  profile_name?: string // all platforms
+  about_section?: string // LinkedIn
+  connection_message?: string // LinkedIn
+  stream_category?: string // Twitch
   validation?: {
     status: 'valid' | 'warning' | 'error'
     score?: number
@@ -72,11 +83,22 @@ export const useContentGeneration = (): UseContentGenerationReturn => {
             : typeof data.content?.tags === 'string' 
               ? data.content.tags.split(' ').filter((tag: string) => tag.trim())
               : [],
+          // Platform-specific content fields
+          description: data.content?.description || undefined,
+          caption: data.content?.caption || undefined,
+          post_body: data.content?.post_body || undefined,
+          headline: data.content?.headline || undefined,
+          bio: data.content?.bio || undefined,
+          username: data.content?.username || undefined,
+          profile_name: data.content?.profile_name || undefined,
+          about_section: data.content?.about_section || undefined,
+          connection_message: data.content?.connection_message || undefined,
+          stream_category: data.content?.stream_category || undefined,
           validation: {
             status: data.validation_passed ? 'valid' : 'error',
             score: data.quality_score || 0,
             issues: Array.isArray(data.issues) ? data.issues : [],
-            suggestions: []
+            suggestions: Array.isArray(data.suggestions) ? data.suggestions : []
           }
         }
 

@@ -4,10 +4,21 @@ import React, { useState } from 'react'
 import { FaCopy, FaCheck, FaExclamationTriangle, FaTimes, FaSpinner } from 'react-icons/fa'
 import { PLATFORMS } from '@/lib/constants/platforms'
 
-interface GeneratedContent {
+export interface GeneratedContent {
   platform: string
   title: string
   tags: string[]
+  // Platform-specific content fields
+  description?: string // YouTube
+  caption?: string // Instagram, TikTok
+  post_body?: string // Facebook, LinkedIn, X/Twitter
+  headline?: string // LinkedIn, Facebook
+  bio?: string // all platforms
+  username?: string // all platforms
+  profile_name?: string // all platforms
+  about_section?: string // LinkedIn
+  connection_message?: string // LinkedIn
+  stream_category?: string // Twitch
   validation?: {
     status: 'valid' | 'warning' | 'error'
     score?: number
