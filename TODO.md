@@ -1,70 +1,391 @@
-- ## 1. Setup Supabase Client (Frontend)**
-  - [x] Install `@supabase/supabase-js` in the Next.js workspace if not already present.
-  - [x] Create `src/lib/supabaseClient.ts` that initialises the Supabase client with `NEXT_PUBLIC_SUPABASE_URL` & `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-  - [x] Unit-test the client initialisation.
+# Platform Content Preview Implementation TODO
 
-- ## 2. Video Upload Flow**
-  - [x] Refactor `VideoUploader` to use the Supabase client:
-    - [x] On file selection, upload the file to `videos/` bucket path with a unique filename (e.g. uuid + original extension).
-    - [x] Replace the current simulated progress with real upload progress from Supabase.
-    - [x] Return the public URL of the uploaded video via `onFileSelect` callback.
-  - [x] Allow cancelling an in-progress upload (abort & remove partially-uploaded file).
-  - [ ] E2E test with Playwright: select a small sample video → verify it appears in Supabase storage and UI shows 100 %.
+## Overview
+Add platform-specific content previews that display generated content in formats resembling actual social media posts (YouTube video cards, Instagram posts, Twitter/X tweets, LinkedIn posts, etc.). Focus on text content formatting while ignoring media thumbnails for now.
 
-- ## 3. Transcript Retrieval**
-  - [x] Create React hook `useTranscription(videoUrl)` inside `src/hooks/useTranscription.ts`:
-    - [x] Call backend POST `/api/v1/transcribe` with payload `{ audio_url: videoUrl }`.
-    - [x] Manage loading, success, error states and return the transcript string.
-  - [x] Integrate the hook in the page:
-    - [x] After upload completes, automatically request transcription.
-    - [x] Show a skeleton/loader while waiting.
-    - [x] Once received, populate `ScriptEditor` (read-only by default, with an "Edit" toggle).
-  - [x] Unit-test the hook with mocked fetch.
-  - [x] Store transcript in Supabase table `transcripts` with columns `video_url`, `transcript`, `created_at`.
+## Prerequisites
+- ✅ Backend APIs already support rich content fields (description, caption, post_body, headline, etc.)
+- ✅ Frontend components (GenerateContentButton, GeneratedContentCard) exist
+- ✅ Platform selection and content generation flow is working
+- ✅ Basic title and tags display is implemented
 
-- ## 4. Platform Selection UI**
-  - [x] Enhance `PlatformSelector` to support multi-select (toggle-group `type="multiple"`).
-  - [x] Keep single-select behaviour for now but store value as array internally for future expansion.
+---
 
-- ## 5. Content Generation Flow**
-  - [ ] Add "Generate Content" button component.
-  - [ ] On click, for each selected platform:
-    - [ ] POST to `/api/v1/generate/{platform}` with body `{ transcript }`.
-    - [ ] Collect responses (title, tags, validation info).
-  - [ ] Display results in a new `GeneratedContentCard` component showing:
-    - [ ] Title text with copy button.
-    - [ ] Tag list with copy-all button.
-    - [ ] Validation status & quality score (green if valid, yellow warning, red error).
-  - [ ] Parallelise requests with `Promise.allSettled` & show per-platform loaders.
-  - [ ] Integration test: mock backend, verify UI renders cards for all platforms.
+## 1. Update TypeScript Interfaces and Types
+**Goal:** Extend frontend types to match backend's rich content model
 
-- ## 6. Content Validation UI (Optional Stretch)**
-  - [ ] Add "Validate" button on each generated card to refetch `/api/v1/validate/{platform}` with the current content.
-  - [ ] Surface suggestions & issues returned by backend.
+### 1.1 Update GeneratedContent Interface
+- [ ] **Task:** Update `GeneratedContent` interface in `src/components/GeneratedContentCard.tsx` to include all platform-specific fields
+- [ ] **Fields to add:**
+  - `description?: string` (YouTube)
+  - `caption?: string` (Instagram, TikTok)
+  - `post_body?: string` (Facebook, LinkedIn, X/Twitter)
+  - `headline?: string` (LinkedIn, Facebook)
+  - `bio?: string` (all platforms)
+  - `username?: string` (all platforms)
+  - `profile_name?: string` (all platforms)
+  - `about_section?: string` (LinkedIn)
+  - `connection_message?: string` (LinkedIn)
+  - `stream_category?: string` (Twitch)
+- [ ] **Validation:** Create a test file `src/types/__tests__/generated-content.test.ts` to validate interface
+- [ ] **Verification:** Compile TypeScript without errors and run `npm run type-check`
 
-- ## 7. Global Error & State Handling**
-  - [ ] Setup React Context or Zustand store to keep track of:
-    - [ ] Uploaded video URL
-    - [ ] Transcript data
-    - [ ] Selected platforms
-    - [ ] Generated content per platform
-  - [ ] Provide toaster notifications for success/error events.
+### 1.2 Update Content Generation Hook
+- [ ] **Task:** Update `useContentGeneration` hook to handle extended content fields
+- [ ] **Implementation:**
+  - Update API response parsing to include all new fields
+  - Ensure all fields are properly typed
+- [ ] **Testing:** Add test cases in `src/hooks/__tests__/useContentGeneration.test.ts`
+- [ ] **Verification:** Mock API response with full content and verify hook returns all fields
 
-- ## 8. Testing & CI**
-  - [ ] Add Jest/React-Testing-Library tests for all new hooks & components.
-  - [ ] Ensure Playwright E2E covers full happy-path (upload → transcribe → generate).
-  - [ ] Update GitHub Actions workflow to run frontend unit & e2e tests.
+### 1.3 Update Platform Constants (Frontend)
+- [ ] **Task:** Add missing `x_twitter` (X / Twitter) entry to `src/lib/constants/platforms.ts`
+- [ ] **Implementation:**
+  - Import an appropriate icon from `react-icons/si` (e.g., `SiTwitter`)
+  - Ensure new platform id matches backend id `x_twitter`
+  - Update any platform selection logic if necessary
+- [ ] **Testing:** Add unit test in `src/lib/constants/__tests__/platforms.test.ts` to assert all 7 platforms are present
+- [ ] **Verification:** UI platform selector shows X (Twitter) as an option
 
-- ## 9. Documentation Updates**
-  - [ ] Update `docs/setup_and_ui.md` with new environment variables & setup steps.
-  - [ ] Provide API contract examples for `/transcribe`, `/generate`, and `/validate`.
-  - [ ] Add GIF walkthrough of the completed UI flow.
+---
 
-Each task above can be individually executed & verified. A programming agent should tackle them top-to-bottom, running associated unit or E2E tests before checking the box and committing progress. 
+## 2. Create Platform-Specific Preview Components
+**Goal:** Build reusable preview components that mimic each platform's UI
 
-### How to check off tasks
-Replace the empty space inside the brackets with an `x` like so: `[x]`.
-> Example:  
-> - [x] Install dependencies
+### 2.1 YouTube Preview Component
+- [ ] **Task:** Create `src/components/previews/YouTubePreview.tsx`
+- [ ] **Design specifications:**
+  - Video card layout with placeholder thumbnail area
+  - Title (max 100 chars, truncate with "...")
+  - Description (max 5000 chars, show first 157 chars with "Show more")
+  - Tag list below description
+  - Character count indicators
+  - YouTube-style styling (red accent, proper typography)
+- [ ] **Props interface:**
+  ```typescript
+  interface YouTubePreviewProps {
+    title: string
+    description?: string
+    tags: string[]
+    className?: string
+  }
+  ```
+- [ ] **Testing:** Create `src/components/previews/__tests__/YouTubePreview.test.tsx`
+- [ ] **Verification:** Render component with sample data, verify character limits and styling
 
-Happy hacking! 🚀 
+### 2.2 Instagram Preview Component
+- [ ] **Task:** Create `src/components/previews/InstagramPreview.tsx`
+- [ ] **Design specifications:**
+  - Square post layout with placeholder image area
+  - Profile section (username, profile picture placeholder)
+  - Caption (max 2200 chars, truncate at 125 with "more")
+  - Hashtags integrated into caption or separate section
+  - Instagram-style UI (gradient buttons, clean typography)
+  - Like, comment, share button placeholders
+- [ ] **Props interface:**
+  ```typescript
+  interface InstagramPreviewProps {
+    title: string // Used as initial caption text
+    caption?: string
+    tags: string[]
+    username?: string
+    profile_name?: string
+    className?: string
+  }
+  ```
+- [ ] **Testing:** Create test file with comprehensive test cases
+- [ ] **Verification:** Test caption truncation and hashtag display
+
+### 2.3 X/Twitter Preview Component
+- [ ] **Task:** Create `src/components/previews/XTwitterPreview.tsx`
+- [ ] **Design specifications:**
+  - Twitter card layout with profile section
+  - Post body (max 280 chars total including hashtags)
+  - Character counter with warning states
+  - Hashtags integrated into post text
+  - Twitter-style UI (blue accents, proper spacing)
+  - Action buttons placeholder (reply, retweet, like)
+- [ ] **Props interface:**
+  ```typescript
+  interface XTwitterPreviewProps {
+    title: string // Used as post body if post_body not provided
+    post_body?: string
+    tags: string[]
+    username?: string
+    profile_name?: string
+    className?: string
+  }
+  ```
+- [ ] **Testing:** Test character limit validation and hashtag integration
+- [ ] **Verification:** Ensure total character count is accurate
+
+### 2.4 LinkedIn Preview Component
+- [ ] **Task:** Create `src/components/previews/LinkedInPreview.tsx`
+- [ ] **Design specifications:**
+  - Professional post layout
+  - Profile section (name, headline, profile picture placeholder)
+  - Post content (max 3000 chars, truncate at 200 with "See more")
+  - Headline display
+  - About section preview
+  - LinkedIn-style UI (blue professional theme)
+  - Professional action buttons placeholder
+- [ ] **Props interface:**
+  ```typescript
+  interface LinkedInPreviewProps {
+    title: string
+    post_body?: string
+    headline?: string
+    about_section?: string
+    tags: string[]
+    username?: string
+    profile_name?: string
+    className?: string
+  }
+  ```
+- [ ] **Testing:** Test professional content formatting
+- [ ] **Verification:** Verify headline and about section display
+
+### 2.5 Facebook Preview Component
+- [ ] **Task:** Create `src/components/previews/FacebookPreview.tsx`
+- [ ] **Design specifications:**
+  - Facebook post layout
+  - Profile section with name and profile picture placeholder
+  - Post content (optimal ≤80 chars for engagement)
+  - Minimal hashtag usage (3-5 tags)
+  - Facebook-style UI (blue theme, rounded corners)
+  - Social action buttons placeholder
+- [ ] **Props interface:**
+  ```typescript
+  interface FacebookPreviewProps {
+    title: string
+    post_body?: string
+    headline?: string
+    tags: string[]
+    username?: string
+    profile_name?: string
+    className?: string
+  }
+  ```
+- [ ] **Testing:** Test post length optimization indicators
+- [ ] **Verification:** Verify hashtag count limits
+
+### 2.6 TikTok Preview Component
+- [ ] **Task:** Create `src/components/previews/TikTokPreview.tsx`
+- [ ] **Design specifications:**
+  - Vertical video preview layout
+  - Caption overlay (max 2200 chars)
+  - Hashtag integration
+  - TikTok-style UI (dark theme, neon accents)
+  - Action buttons sidebar placeholder
+- [ ] **Props interface:**
+  ```typescript
+  interface TikTokPreviewProps {
+    title: string
+    caption?: string
+    tags: string[]
+    username?: string
+    className?: string
+  }
+  ```
+- [ ] **Testing:** Test caption and hashtag display
+- [ ] **Verification:** Verify TikTok-specific styling
+
+### 2.7 Twitch Preview Component
+- [ ] **Task:** Create `src/components/previews/TwitchPreview.tsx`
+- [ ] **Design specifications:**
+  - Stream preview layout
+  - Stream title (max 140 chars)
+  - Category/game display
+  - Channel description
+  - Viewer count placeholder
+  - Twitch-style UI (purple theme)
+- [ ] **Props interface:**
+  ```typescript
+  interface TwitchPreviewProps {
+    title: string
+    bio?: string
+    stream_category?: string
+    tags: string[]
+    username?: string
+    className?: string
+  }
+  ```
+- [ ] **Testing:** Test stream title and category display
+- [ ] **Verification:** Verify Twitch gaming focus
+
+---
+
+## 3. Create Platform Preview Selector
+**Goal:** Centralized component to render appropriate preview based on platform
+
+### 3.1 Platform Preview Factory Component
+- [ ] **Task:** Create `src/components/previews/PlatformPreview.tsx`
+- [ ] **Implementation:**
+  - Switch component that renders appropriate preview based on platform
+  - Fallback to generic preview for unsupported platforms
+  - Consistent error handling
+- [ ] **Props interface:**
+  ```typescript
+  interface PlatformPreviewProps {
+    platform: string
+    content: GeneratedContent
+    className?: string
+  }
+  ```
+- [ ] **Testing:** Test platform switching and fallback behavior
+- [ ] **Verification:** Ensure all platforms render correctly
+
+### 3.2 Preview Components Index
+- [ ] **Task:** Create `src/components/previews/index.ts` for clean exports
+- [ ] **Implementation:** Export all preview components and main PlatformPreview
+- [ ] **Verification:** Verify all imports work correctly
+
+---
+
+## 4. Update GeneratedContentCard Component
+**Goal:** Integrate platform previews into existing content cards
+
+### 4.1 Add Preview Toggle
+- [ ] **Task:** Update `GeneratedContentCard` to include preview mode toggle
+- [ ] **Implementation:**
+  - Add "Preview" / "Details" toggle button
+  - Default to details view (current implementation)
+  - Preview mode shows platform-specific preview
+  - Details mode shows current title/tags/validation view
+- [ ] **UI specifications:**
+  - Toggle button in card header
+  - Smooth transition between modes
+  - Preserve existing functionality in details mode
+- [ ] **Testing:** Test toggle functionality and mode persistence
+- [ ] **Verification:** Ensure both modes work correctly
+
+### 4.2 Integrate Platform Previews
+- [ ] **Task:** Add platform preview rendering to the card
+- [ ] **Implementation:**
+  - Import PlatformPreview component
+  - Pass content data to preview component
+  - Handle missing optional fields gracefully
+  - Maintain responsive design
+- [ ] **Testing:** Test with various content combinations
+- [ ] **Verification:** Verify all platforms render in preview mode
+
+### 4.3 Enhanced Copy Functionality
+- [ ] **Task:** Add platform-specific copy functionality
+- [ ] **Implementation:**
+  - Copy formatted content for each platform
+  - Include relevant fields (description, caption, post_body)
+  - Smart formatting based on platform requirements
+- [ ] **Features:**
+  - "Copy for [Platform]" button
+  - Copy full formatted post content
+  - Success feedback for each copy action
+- [ ] **Testing:** Test copy functionality across all platforms
+- [ ] **Verification:** Verify copied content is properly formatted
+
+---
+
+## 5. Create Platform-Specific Utilities
+**Goal:** Helper functions for platform-specific content formatting
+
+### 5.1 Content Formatting Utilities
+- [ ] **Task:** Create `src/lib/utils/contentFormatters.ts`
+- [ ] **Functions to implement:**
+  - `formatForYouTube(content: GeneratedContent): string`
+  - `formatForInstagram(content: GeneratedContent): string`
+  - `formatForTwitter(content: GeneratedContent): string`
+  - `formatForLinkedIn(content: GeneratedContent): string`
+  - `formatForFacebook(content: GeneratedContent): string`
+  - `formatForTikTok(content: GeneratedContent): string`
+  - `formatForTwitch(content: GeneratedContent): string`
+- [ ] **Testing:** Create comprehensive test suite
+- [ ] **Verification:** Test all formatting functions with edge cases
+
+### 5.2 Character Count Utilities
+- [ ] **Task:** Create `src/lib/utils/characterLimits.ts`
+- [ ] **Implementation:**
+  - Platform-specific character limit constants
+  - Character count validation functions
+  - Truncation utilities with ellipsis
+  - Warning level indicators (good/warning/danger)
+- [ ] **Testing:** Test character counting accuracy
+- [ ] **Verification:** Verify against backend platform rules
+
+### 5.3 Platform Rules Integration
+- [ ] **Task:** Create `src/lib/utils/platformRules.ts`
+- [ ] **Implementation:**
+  - Frontend constants matching backend platform rules
+  - Validation helpers for content fields
+  - Optimal length suggestions
+- [ ] **Testing:** Test rule validation functions
+- [ ] **Verification:** Ensure consistency with backend rules
+
+---
+
+## 6. Enhance Content Generation Hook
+**Goal:** Support preview-specific features in content generation
+
+### 6.1 Add Preview Mode State
+- [ ] **Task:** Update `useContentGeneration` hook with preview support
+- [ ] **Implementation:**
+  - Add preview mode state management
+  - Track which platforms have preview data
+  - Handle preview-specific loading states
+- [ ] **Testing:** Test preview state management
+- [ ] **Verification:** Verify state persistence and updates
+
+### 6.2 Add Content Validation
+- [ ] **Task:** Add client-side content validation
+- [ ] **Implementation:**
+  - Validate content against platform rules
+  - Show validation warnings in previews
+  - Provide improvement suggestions
+- [ ] **Testing:** Test validation logic
+- [ ] **Verification:** Ensure validation matches backend
+
+---
+
+## Validation Instructions for Each Task
+
+After completing each section, validate by running:
+
+1. **Code Quality:**
+   ```bash
+   npm run lint
+   npm run type-check
+   npm run format
+   ```
+
+2. **Testing:**
+   ```bash
+   npm run test
+   npm run test:coverage
+   ```
+
+3. **Build Verification:**
+   ```bash
+   npm run build
+   npm run start
+   ```
+
+## Completion Criteria
+
+- [ ] All platform preview components are implemented and working
+- [ ] Content generation returns rich content data
+- [ ] Preview toggle works in all content cards
+- [ ] Copy functionality works for platform-specific formats
+- [ ] All tests pass with >85% coverage
+- [ ] TypeScript compiles without errors
+- [ ] All components are responsive and accessible
+
+## Notes
+
+- **Media Content:** Thumbnail/image display is intentionally excluded from this phase
+- **Platform Accuracy:** Previews should closely resemble actual platform layouts
+- **Performance:** New features should not significantly impact application performance
+
+---
+
+**Total Estimated Tasks:** 45 individual action items
+**Priority:** High-impact feature for user experience
+
+Each task is designed to be independently completable and testable, allowing for parallel development and incremental progress validation. 
