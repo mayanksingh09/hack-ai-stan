@@ -2,9 +2,71 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { PlatformPreview } from '../PlatformPreview'
 
+// Define mock component prop types
+interface MockYouTubeProps {
+  title: string
+  description?: string
+  tags: string[]
+  className?: string
+}
+
+interface MockInstagramProps {
+  title: string
+  caption?: string
+  tags: string[]
+  username?: string
+  profile_name?: string
+  className?: string
+}
+
+interface MockXTwitterProps {
+  title: string
+  post_body?: string
+  tags: string[]
+  username?: string
+  profile_name?: string
+  className?: string
+}
+
+interface MockLinkedInProps {
+  title: string
+  post_body?: string
+  headline?: string
+  about_section?: string
+  tags: string[]
+  profile_name?: string
+  className?: string
+}
+
+interface MockFacebookProps {
+  title: string
+  post_body?: string
+  headline?: string
+  tags: string[]
+  profile_name?: string
+  className?: string
+}
+
+interface MockTikTokProps {
+  title: string
+  caption?: string
+  tags: string[]
+  username?: string
+  className?: string
+}
+
+interface MockTwitchProps {
+  title: string
+  bio?: string
+  stream_category?: string
+  tags: string[]
+  username?: string
+  className?: string
+}
+
 // Mock all platform preview components
 jest.mock('../YouTubePreview', () => ({
-  YouTubePreview: ({ title, description, tags, className }: any) => (
+  YouTubePreview: ({ title, description, tags, className }: MockYouTubeProps) => (
     <div data-testid="youtube-preview" className={className}>
       <div>YouTube: {title}</div>
       {description && <div>Description: {description}</div>}
@@ -14,7 +76,7 @@ jest.mock('../YouTubePreview', () => ({
 }))
 
 jest.mock('../InstagramPreview', () => ({
-  InstagramPreview: ({ title, caption, tags, username, profile_name, className }: any) => (
+  InstagramPreview: ({ title, caption, tags, username, profile_name, className }: MockInstagramProps) => (
     <div data-testid="instagram-preview" className={className}>
       <div>Instagram: {title}</div>
       {caption && <div>Caption: {caption}</div>}
@@ -26,7 +88,7 @@ jest.mock('../InstagramPreview', () => ({
 }))
 
 jest.mock('../XTwitterPreview', () => ({
-  XTwitterPreview: ({ title, post_body, tags, username, profile_name, className }: any) => (
+  XTwitterPreview: ({ title, post_body, tags, username, profile_name, className }: MockXTwitterProps) => (
     <div data-testid="x-twitter-preview" className={className}>
       <div>X/Twitter: {title}</div>
       {post_body && <div>Post: {post_body}</div>}
@@ -38,7 +100,7 @@ jest.mock('../XTwitterPreview', () => ({
 }))
 
 jest.mock('../LinkedInPreview', () => ({
-  LinkedInPreview: ({ title, post_body, headline, about_section, tags, profile_name, className }: any) => (
+  LinkedInPreview: ({ title, post_body, headline, about_section, tags, profile_name, className }: MockLinkedInProps) => (
     <div data-testid="linkedin-preview" className={className}>
       <div>LinkedIn: {title}</div>
       {post_body && <div>Post: {post_body}</div>}
@@ -51,7 +113,7 @@ jest.mock('../LinkedInPreview', () => ({
 }))
 
 jest.mock('../FacebookPreview', () => ({
-  FacebookPreview: ({ title, post_body, headline, tags, profile_name, className }: any) => (
+  FacebookPreview: ({ title, post_body, headline, tags, profile_name, className }: MockFacebookProps) => (
     <div data-testid="facebook-preview" className={className}>
       <div>Facebook: {title}</div>
       {post_body && <div>Post: {post_body}</div>}
@@ -63,7 +125,7 @@ jest.mock('../FacebookPreview', () => ({
 }))
 
 jest.mock('../TikTokPreview', () => ({
-  TikTokPreview: ({ title, caption, tags, username, className }: any) => (
+  TikTokPreview: ({ title, caption, tags, username, className }: MockTikTokProps) => (
     <div data-testid="tiktok-preview" className={className}>
       <div>TikTok: {title}</div>
       {caption && <div>Caption: {caption}</div>}
@@ -74,7 +136,7 @@ jest.mock('../TikTokPreview', () => ({
 }))
 
 jest.mock('../TwitchPreview', () => ({
-  TwitchPreview: ({ title, bio, stream_category, tags, username, className }: any) => (
+  TwitchPreview: ({ title, bio, stream_category, tags, username, className }: MockTwitchProps) => (
     <div data-testid="twitch-preview" className={className}>
       <div>Twitch: {title}</div>
       {bio && <div>Bio: {bio}</div>}
