@@ -21,7 +21,6 @@ export const FacebookPreview: React.FC<FacebookPreviewProps> = ({
   post_body,
   headline,
   tags,
-  username = 'your.username',
   profile_name = 'Your Profile',
   className = ''
 }) => {

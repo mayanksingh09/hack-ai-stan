@@ -23,7 +23,6 @@ export const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({
   headline,
   about_section,
   tags,
-  username = 'your-username',
   profile_name = 'Your Profile',
   className = ''
 }) => {
