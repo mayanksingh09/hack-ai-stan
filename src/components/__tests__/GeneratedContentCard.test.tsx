@@ -47,10 +47,9 @@ describe('GeneratedContentCard', () => {
       render(<GeneratedContentCard content={defaultContent} />)
       
       expect(screen.getByText('youtube')).toBeInTheDocument()
-      expect(screen.getByText('How to Build Amazing React Components')).toBeInTheDocument()
-      expect(screen.getByText('react')).toBeInTheDocument()
-      expect(screen.getByText('tutorial')).toBeInTheDocument()
-      expect(screen.getByText('frontend')).toBeInTheDocument()
+      // Content is now rendered within the platform preview mock
+      expect(screen.getByText('Title: How to Build Amazing React Components')).toBeInTheDocument()
+      expect(screen.getByText('Tags: react, tutorial, frontend')).toBeInTheDocument()
     })
 
     it('should show loading state', () => {
@@ -69,45 +68,27 @@ describe('GeneratedContentCard', () => {
     })
   })
 
-  describe('View mode toggle', () => {
-    it('should default to details view', () => {
+  describe('Preview-only mode', () => {
+    it('should show platform preview by default', () => {
       render(<GeneratedContentCard content={defaultContent} />)
       
-      expect(screen.getByText('Details')).toHaveClass('bg-white')
-      expect(screen.getByText('Preview')).not.toHaveClass('bg-white')
-      expect(screen.getByText('Title')).toBeInTheDocument() // Details view content
+      expect(screen.getByTestId('platform-preview')).toBeInTheDocument()
+      expect(screen.queryByText('Details')).not.toBeInTheDocument()
+      expect(screen.queryByText('Preview')).not.toBeInTheDocument()
     })
 
-    it('should switch to preview view when preview button is clicked', () => {
+    it('should not show details view elements', () => {
       render(<GeneratedContentCard content={defaultContent} />)
       
-      const previewButton = screen.getByText('Preview')
-      fireEvent.click(previewButton)
-      
-      expect(screen.getByText('Preview')).toHaveClass('bg-white')
-      expect(screen.getByText('Details')).not.toHaveClass('bg-white')
-      expect(screen.getByTestId('platform-preview')).toBeInTheDocument()
-    })
-
-    it('should switch back to details view when details button is clicked', () => {
-      render(<GeneratedContentCard content={defaultContent} />)
-      
-      // Switch to preview
-      fireEvent.click(screen.getByText('Preview'))
-      expect(screen.getByTestId('platform-preview')).toBeInTheDocument()
-      
-      // Switch back to details
-      fireEvent.click(screen.getByText('Details'))
-      expect(screen.getByText('Title')).toBeInTheDocument()
-      expect(screen.queryByTestId('platform-preview')).not.toBeInTheDocument()
+      expect(screen.queryByText('Title')).not.toBeInTheDocument()
+      expect(screen.queryByText('Tags')).not.toBeInTheDocument()
+      expect(screen.queryByText('Copy All')).not.toBeInTheDocument()
     })
   })
 
   describe('Platform preview integration', () => {
     it('should render platform preview with correct props', () => {
       render(<GeneratedContentCard content={defaultContent} />)
-      
-      fireEvent.click(screen.getByText('Preview'))
       
       const preview = screen.getByTestId('platform-preview')
       expect(preview).toBeInTheDocument()
@@ -119,38 +100,12 @@ describe('GeneratedContentCard', () => {
     it('should apply correct className to platform preview', () => {
       render(<GeneratedContentCard content={defaultContent} />)
       
-      fireEvent.click(screen.getByText('Preview'))
-      
       const preview = screen.getByTestId('platform-preview')
       expect(preview).toHaveClass('w-full', 'max-w-lg')
     })
   })
 
   describe('Copy functionality', () => {
-    it('should copy title when title copy button is clicked', async () => {
-      render(<GeneratedContentCard content={defaultContent} />)
-      
-      const titleCopyButton = screen.getByText('Copy')
-      fireEvent.click(titleCopyButton)
-      
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('How to Build Amazing React Components')
-      await waitFor(() => {
-        expect(screen.getByText('Copied!')).toBeInTheDocument()
-      })
-    })
-
-    it('should copy tags when tags copy button is clicked', async () => {
-      render(<GeneratedContentCard content={defaultContent} />)
-      
-      const tagsCopyButton = screen.getByText('Copy All')
-      fireEvent.click(tagsCopyButton)
-      
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('react tutorial frontend')
-      await waitFor(() => {
-        expect(screen.getByText('Copied!')).toBeInTheDocument()
-      })
-    })
-
     it('should copy platform-specific formatted content', async () => {
       render(<GeneratedContentCard content={defaultContent} />)
       
@@ -282,7 +237,7 @@ Learn how to build reusable React components with TypeScript.
       expect(screen.getByText('Valid (95%)')).toBeInTheDocument()
     })
 
-    it('should show warning validation', () => {
+    it('should show warning validation badge', () => {
       const warningContent: GeneratedContent = {
         ...defaultContent,
         validation: {
@@ -295,11 +250,12 @@ Learn how to build reusable React components with TypeScript.
       render(<GeneratedContentCard content={warningContent} />)
       
       expect(screen.getByText('Needs Review (70%)')).toBeInTheDocument()
-      expect(screen.getByText('Issues')).toBeInTheDocument()
-      expect(screen.getByText('Title could be shorter')).toBeInTheDocument()
+      // Details like issues are no longer shown in preview-only mode
+      expect(screen.queryByText('Issues')).not.toBeInTheDocument()
+      expect(screen.queryByText('Title could be shorter')).not.toBeInTheDocument()
     })
 
-    it('should show error validation', () => {
+    it('should show error validation badge', () => {
       const errorContent: GeneratedContent = {
         ...defaultContent,
         validation: {
@@ -312,10 +268,11 @@ Learn how to build reusable React components with TypeScript.
       render(<GeneratedContentCard content={errorContent} />)
       
       expect(screen.getByText('Issues Found')).toBeInTheDocument()
-      expect(screen.getByText('Too many tags')).toBeInTheDocument()
-      expect(screen.getByText('Suggestions')).toBeInTheDocument()
-      expect(screen.getByText('Remove some tags')).toBeInTheDocument()
-      expect(screen.getByText('Use more specific tags')).toBeInTheDocument()
+      // Details like issues and suggestions are no longer shown in preview-only mode
+      expect(screen.queryByText('Too many tags')).not.toBeInTheDocument()
+      expect(screen.queryByText('Suggestions')).not.toBeInTheDocument()
+      expect(screen.queryByText('Remove some tags')).not.toBeInTheDocument()
+      expect(screen.queryByText('Use more specific tags')).not.toBeInTheDocument()
     })
   })
 
@@ -346,7 +303,7 @@ Learn how to build reusable React components with TypeScript.
       
       render(<GeneratedContentCard content={defaultContent} />)
       
-      fireEvent.click(screen.getByText('Copy'))
+      fireEvent.click(screen.getByText('Copy for YouTube'))
       
       await waitFor(() => {
         expect(consoleSpy).toHaveBeenCalledWith('Failed to copy:', expect.any(Error))
